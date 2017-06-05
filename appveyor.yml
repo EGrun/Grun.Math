@@ -4,8 +4,8 @@ branches:
   - master
 image: Visual Studio 2017
 before_build:
-- cmd: dotnet restore src
+- cmd: dotnet restore
 build:
   verbosity: minimal
 test_script:
-- cmd: dotnet test src\Graph.Tests\Graph.Tests.csproj
+- cmd: dotnet test tests\Graph.Tests\Graph.Tests.csproj

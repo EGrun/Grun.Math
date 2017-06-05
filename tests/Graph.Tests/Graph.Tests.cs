@@ -148,7 +148,7 @@ namespace Graph.Tests
             yield return new object[] { 10 };
             yield return new object[] { 1000 };
             yield return new object[] { 1_000_000 };
-            yield return new object[] { MaxHashSetSize }; //limit prior to dotnetcore 2.0
+            //yield return new object[] { MaxHashSetSize }; //limit prior to dotnetcore 2.0
             //yield return new object[] { Int32.MaxValue }; //new limit with 2.0? needs more testing
         }
 
