@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <PackageId>grun.math</PackageId>
+    <PackageVersion>1.0</PackageVersion>
+    <Authors>Eric Grun</Authors>
+    <PackageLicenseUrl>https://github.com/EGrun/Grun.Math/blob/master/LICENSE</PackageLicenseUrl>
+    <Owners>EG Concepts of NYC LLC</Owners>
+    <PackageProjectUrl>https://github.com/EGrun/Grun.Math</PackageProjectUrl>
+    <Summary>Graph Algorithms</Summary>
+    <Title>Grun.Math</Title>
+    <Description>A sample of Graphing algorithms with a focus on distributed computation.</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>7</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>7</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.1.248" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+</Project>
