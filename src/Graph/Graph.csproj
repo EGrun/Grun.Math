@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netstandard1.6</TargetFramework>
     <PackageId>grun.math</PackageId>
     <PackageVersion>1.0</PackageVersion>
     <Authors>Eric Grun</Authors>

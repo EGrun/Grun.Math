@@ -28,120 +28,110 @@ namespace Graph
     ///
     /// Assert.Equal(false, graph.HasCycle(0));
     /// </code></example>
-    public static class GraphExtensions
+    public class Digraph<T>
     {
 
+        readonly Func<T, IEnumerable<T>> _forwardAdjacencies;
+        readonly IEqualityComparer<T> _comparer;
+
         /// <summary>
-        /// Determines if there exists a cycle in the graph containing the vertex
+        /// Initializes a new instance of the <see cref="T:Graph.Digraph`1"/> class.
         /// </summary>
-        /// <returns><c>true</c>, if cycle was detected, <c>false</c> otherwise.</returns>
-        /// <param name="graph">Function to compute forward adjacency list for Vertex.</param>
-        /// <param name="vertex">Vertex.</param>
-        /// <typeparam name="T">The backing data type for vertices.</typeparam>
-        public static Boolean HasCycle<T>(this Func<T, IEnumerable<T>> graph, T vertex)
+        /// <param name="forwardAdjacencies">Forward adjacencies.</param>
+        public Digraph(Func<T, IEnumerable<T>> forwardAdjacencies)
+            : this(forwardAdjacencies, EqualityComparer<T>.Default)
         {
-            if (graph == null)
-                throw new ArgumentNullException(nameof(graph));
-            Contract.EndContractBlock();
-
-            if (object.ReferenceEquals(vertex, null))
-                return false;
-
-            return graph.HasCycle(vertex, EqualityComparer<T>.Default, 0);
         }
 
         /// <summary>
-        /// Determines if there exists a cycle in the graph containing the vertex
+        /// Initializes a new instance of the <see cref="T:Graph.Digraph`1"/> class.
         /// </summary>
-        /// <returns><c>true</c>, if cycle was detected, <c>false</c> otherwise.</returns>
-        /// <param name="graph">Function to compute forward adjacency list for Vertex.</param>
-        /// <param name="vertex">Vertex.</param>
-        /// <typeparam name="T">The backing data type for vertices.</typeparam>
-        public static Boolean HasCycle<T>(this Func<T, IEnumerable<T>> graph, T vertex, Int32 capacity)
+        /// <param name="forwardAdjacencies">Forward adjacencies.</param>
+        /// <param name="comparer">Comparer</param>
+        public Digraph(Func<T, IEnumerable<T>> forwardAdjacencies, IEqualityComparer<T> comparer)
         {
-            if (graph == null)
-                throw new ArgumentNullException(nameof(graph));
+            if (forwardAdjacencies == null)
+                throw new NullReferenceException(nameof(forwardAdjacencies));
+            if (comparer == null)
+                throw new NullReferenceException(nameof(comparer));
             Contract.EndContractBlock();
 
-            if (object.ReferenceEquals(vertex, null))
-                return false;
-
-            return graph.HasCycle(vertex, EqualityComparer<T>.Default, capacity);
+            _forwardAdjacencies = forwardAdjacencies;
+            _comparer = comparer;
         }
 
         /// <summary>
-        /// Determines if there exists a cycle in the graph containing the vertex
-        /// </summary>
+        /// Determines if there exists a cycle in the graph containing the origin vertex
+        /// </summary>if (object.ReferenceEquals(origin, null))
+        /// <param name="origin">Origin vertex.</param>
         /// <returns><c>true</c>, if cycle was detected, <c>false</c> otherwise.</returns>
-        /// <param name="graph">Function to compute forward adjacency list for Vertex.</param>
-        /// <param name="vertex">Vertex.</param>
-        /// <typeparam name="T">The backing data type for vertices.</typeparam>
-        public static Boolean HasCycle<T>(this Func<T, IEnumerable<T>> graph, T vertex, IEqualityComparer<T> comparer)
+        public virtual Boolean HasCycle(T origin)
         {
-            if (graph == null)
-                throw new ArgumentNullException(nameof(graph));
-            Contract.EndContractBlock();
-
-            if (object.ReferenceEquals(vertex, null))
-                return false;
-
-            return graph.HasCycle(vertex, comparer, 0);
+            return HasCycle(origin, 0);
         }
 
         /// <summary>
-        /// Determines if there exists a cycle in the graph containing the vertex
+        /// Determines if there exists a cycle in the graph containing the origin vertex
         /// </summary>
         /// <returns><c>true</c>, if cycle was detected, <c>false</c> otherwise.</returns>
-        /// <param name="graph">Function to compute forward adjacency list for Vertex.</param>
-        /// <param name="source">Vertex.</param>
-        /// <param name="comparer">Equality Comparer for vertex type.</param>
-        /// <typeparam name="T">The backing data type for vertices.</typeparam>
-        public static Boolean HasCycle<T>(
-            this Func<T, IEnumerable<T>> graph, T source, IEqualityComparer<T> comparer, int capacity)
+        /// <param name="origin">Origin vertex.</param>
+        /// <param name="capacity">Initial capacity of working data containers, NetStandard 2.0 required</param>
+        public virtual Boolean HasCycle(T origin, Int32 capacity)
         {
-            if (graph == null)
-                throw new ArgumentNullException(nameof(graph));
-            Contract.EndContractBlock();
 
-            if (object.ReferenceEquals(source, null))
-                return false;
+#if NETSTANDARD2_0
+            var skipList = new HashSet<T>(capacity, _comparer);
+            var knownBackEdges = new HashSet<T>(capacity, _comparer);
+#else
+            var skipList = new HashSet<T>(_comparer);
+            var knownBackEdges = new HashSet<T>(_comparer);
+#endif
 
-            var resolved = new HashSet<T>(capacity, comparer);
-            var backedges = new HashSet<T>(capacity, comparer);
-            var toResolve = new Stack<T>(capacity);
+            return HasCycle(origin, knownBackEdges, skipList);
+        }
 
-            toResolve.Push(source);
+        /// <summary>
+        /// Determines if there exists a cycle in the graph containing the origin vertex
+        /// </summary>
+        /// <returns><c>true</c>, if cycle was detected, <c>false</c> otherwise.</returns>
+        /// <param name="origin">Origin.</param>
+        /// <param name="knownBackEdges">List of known back edges.</param>
+        /// <param name="skipList">Edges to skip.</param>
+        protected Boolean HasCycle(T origin, ICollection<T> knownBackEdges, ICollection<T> skipList)
+        {
 
-            while (toResolve.Any())
+            var stack = new Stack<T>(new[] { origin });
+
+            while (stack.Any())
             {
-                var vertex = toResolve.Pop();
+                var vertex = stack.Pop();
 
-                if (resolved.Contains(vertex))
+                if (skipList.Contains(vertex))
                 {
                     continue;
                 }
 
-                backedges.Add(vertex);
+                knownBackEdges.Add(vertex);
 
-                var forwardAdjacencies = graph(vertex).Where(fa => !resolved.Contains(fa));
-                if (!forwardAdjacencies.Any())
+                var fa = _forwardAdjacencies(vertex)?.Where(adj => !skipList.Contains(adj));
+                if (fa == null || !fa.Any())
                 {
                     //base case
-                    backedges.Remove(vertex);
-                    resolved.Add(vertex);
+                    knownBackEdges.Remove(vertex);
+                    skipList.Add(vertex);
                 }
 
                 else
                 {
                     //recursive case
-                    toResolve.Push(vertex); //push vertex back on to stack
+                    stack.Push(vertex); //push vertex back on to stack
 
-                    foreach (var fa in forwardAdjacencies)
+                    foreach (var adj in fa)
                     {
-                        if (backedges.Contains(fa))
+                        if (knownBackEdges.Contains(adj))
                             return true;
 
-                        toResolve.Push(fa);
+                        stack.Push(adj);
                     }
                 }
 

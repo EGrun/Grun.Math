@@ -14,14 +14,21 @@ namespace Graph.Tests
         // HashSet internally contains an array of T + 2 ints
         // so max size for an int hashset would be (int.MaxValue / (sizeof(int)*3)) - 14
         // but they are sized to prime numbers so we need the closest prime that is under the max threshold
-        public const int MaxHashSetSize = 159727031;
-        //public const int MaxHashSetSize = 110921543; //max hash set size due to internal doubling of the array size
+        //public const int MaxHashSetSize = 159727031;
+        public const int MaxHashSetSize = 110921543; //max hash set size due to internal doubling of the array size
 
         [Fact]
-        public void HasCycle_NullVertexDoesNotThrowReturnsFalse()
+        public void HasCycle_Null_vertex_does_not_throw_returns_false()
         {
-            Func<object, IEnumerable<object>> graph = (v) => null;
-            Assert.Equal(false, graph.HasCycle(null));
+            var digraph = new Digraph<object>((v) => new object[0]);
+            Assert.Equal(false, digraph.HasCycle(null));
+        }
+
+        [Fact]
+        public void HasCycle_Null_edges_does_not_throw()
+        {
+            var digraph = new Digraph<object>((v) => null);
+            Assert.Equal(false, digraph.HasCycle(new object()));
         }
 
         [Theory]
@@ -29,8 +36,8 @@ namespace Graph.Tests
         public void HasCycle_Dictionary_Tests<T>
             (IDictionary<T, IEnumerable<T>> dataset, T node, bool expected)
         {
-            Func<T, IEnumerable<T>> graph = (v) => dataset[v];
-            Assert.Equal(expected, graph.HasCycle(node));
+            var digraph = new Digraph<T>((v) => dataset[v]);
+            Assert.Equal(expected, digraph.HasCycle(node));
         }
 
         public static IEnumerable<object[]> HasCycle_Dictionary_TestData()
@@ -147,37 +154,35 @@ namespace Graph.Tests
             yield return new object[] { 1 };
             yield return new object[] { 10 };
             yield return new object[] { 1000 };
-            yield return new object[] { 1_000_000 };
-            //yield return new object[] { MaxHashSetSize }; //limit prior to dotnetcore 2.0
+            yield return new object[] { MaxHashSetSize }; //limit prior to dotnetcore 2.0
+
+#if NETSTANDARD2_0
             //yield return new object[] { Int32.MaxValue }; //new limit with 2.0? needs more testing
+#endif
         }
 
         [Theory]
         [MemberData(nameof(GraphSizes))]
         public void OneDimensionalGraphTest(int size)
         {
-            var hash = new HashSet<int>();
-
-            Func<int, IEnumerable<int>> f = (v) => v < size ? new int[] { v + 1 } : new int[0];
-            Assert.Equal(false, f.HasCycle(0, size));
+            var digraph = new Digraph<int>((v) => v < size - 1 ? new int[] { v + 1 } : new int[0]);
+            Assert.Equal(false, digraph.HasCycle(0, size));
         }
 
         [Theory]
         [MemberData(nameof(GraphSizes))]
         public void OneDimensionalCycleGraphTest(int size)
         {
-
-            Func<int, IEnumerable<int>> f = (v) => v < size ? new int[] { v + 1 } : new int[] { 0 };
-            Assert.Equal(true, f.HasCycle(0, size));
+            var digraph = new Digraph<int>((v) => v < size - 1 ? new int[] { v + 1 } : new int[] { 0 });
+            Assert.Equal(true, digraph.HasCycle(0, size));
         }
-
 
         [Theory]
         [MemberData(nameof(HasCycle_ArrayOfArrays_TestData))]
         public void HasCycle_ArrayOfArrays_Tests(int[][] graph, int node, bool expected)
         {
-            Func<int, IEnumerable<int>> f = (v) => graph[v];
-            Assert.Equal(expected, f.HasCycle(node));
+            var digraph = new Digraph<int>((v) => graph[v]);
+            Assert.Equal(expected, digraph.HasCycle(node));
         }
 
         public static IEnumerable<object[]> HasCycle_ArrayOfArrays_TestData()
@@ -203,9 +208,9 @@ namespace Graph.Tests
             (T node, T[] V, (T v1, T v2)[] E, bool expected)
         {
             var lookup = E.ToLookup(e => e.v1, e => e.v2);
-            Func<T, IEnumerable<T>> f = (v) => lookup[v];
 
-            Assert.Equal(expected, f.HasCycle(node));
+            var digraph = new Digraph<T>((v) => lookup[v]);
+            Assert.Equal(expected, digraph.HasCycle(node));
         }
 
         public static IEnumerable<object[]> HasCycle_ValueTupleEdgeSet_TestData()
@@ -240,14 +245,13 @@ namespace Graph.Tests
                 ["Rabbit"] = new String[] { "CAMEL" }
             };
 
-            Func<string, IEnumerable<string>> graphAlphaIgnoreCase = (v) => animalSet[v];
-
-            Assert.True(graphAlphaIgnoreCase.HasCycle("Angelfish", ignoreCaseComparer));
-            Assert.True(graphAlphaIgnoreCase.HasCycle("Bear", ignoreCaseComparer));
-            Assert.False(graphAlphaIgnoreCase.HasCycle("Camel", ignoreCaseComparer));
-            Assert.True(graphAlphaIgnoreCase.HasCycle("Cat", ignoreCaseComparer));
-            Assert.True(graphAlphaIgnoreCase.HasCycle("Dog", ignoreCaseComparer));
-            Assert.False(graphAlphaIgnoreCase.HasCycle("Rabbit", ignoreCaseComparer));
+            var ignoreCaseGraph = new Digraph<string>((v) => animalSet[v], ignoreCaseComparer);
+            Assert.True(ignoreCaseGraph.HasCycle("Angelfish"));
+            Assert.True(ignoreCaseGraph.HasCycle("Bear"));
+            Assert.False(ignoreCaseGraph.HasCycle("Camel"));
+            Assert.True(ignoreCaseGraph.HasCycle("Cat"));
+            Assert.True(ignoreCaseGraph.HasCycle("Dog"));
+            Assert.False(ignoreCaseGraph.HasCycle("Rabbit"));
 
             //maps data into congruent vertices
             const int moduloIndex = 4;
@@ -265,14 +269,13 @@ namespace Graph.Tests
                 new int[] {0},
             };
 
-            Func<int, IEnumerable<int>> g = (v) =>
-                graphMap[v % moduloIndex].Select(adj => getRandomCongruent(adj));
+            var arrayGraph = new Digraph<int>((v) => graphMap[v % moduloIndex].Select(getRandomCongruent));
 
-            Assert.True(g.HasCycle(0, congruencyComparer));
-            Assert.False(g.HasCycle(1, congruencyComparer));
-            Assert.False(g.HasCycle(2, congruencyComparer));
-            Assert.True(g.HasCycle(3, congruencyComparer));
-            Assert.True(g.HasCycle(43, congruencyComparer));
+            Assert.True(arrayGraph.HasCycle(0));
+            Assert.False(arrayGraph.HasCycle(1));
+            Assert.False(arrayGraph.HasCycle(2));
+            Assert.True(arrayGraph.HasCycle(3));
+            Assert.True(arrayGraph.HasCycle(43));
 
         }
 
