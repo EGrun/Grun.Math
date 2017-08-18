@@ -78,14 +78,8 @@ namespace Graph
         /// <param name="capacity">Initial capacity of working data containers, NetStandard 2.0 required</param>
         public virtual Boolean HasCycle(T origin, Int32 capacity)
         {
-
-#if NETSTANDARD2_0
-            var skipList = new HashSet<T>(capacity, _comparer);
-            var knownBackEdges = new HashSet<T>(capacity, _comparer);
-#else
             var skipList = new HashSet<T>(_comparer);
             var knownBackEdges = new HashSet<T>(_comparer);
-#endif
 
             return HasCycle(origin, knownBackEdges, skipList);
         }
