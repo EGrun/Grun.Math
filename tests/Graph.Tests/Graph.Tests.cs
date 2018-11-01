@@ -8,26 +8,19 @@ namespace Graph.Tests
 
     public class GraphTests
     {
-        //gcAllowVeryLargeObjects disabled
-        public const int MaxArrayLength = (int.MaxValue / sizeof(int)) - 14;
-
-        // HashSet internally contains an array of T + 2 ints
-        // so max size for an int hashset would be (int.MaxValue / (sizeof(int)*3)) - 14
-        // but they are sized to prime numbers so we need the closest prime that is under the max threshold
-        //public const int MaxHashSetSize = 159727031;
-        public const int MaxHashSetSize = 110921543; //max hash set size due to internal doubling of the array size
+        public const int MaxHashSetSize = 110921543;
 
         [Fact]
         public void HasCycle_Null_vertex_does_not_throw_returns_false()
         {
-            var digraph = new Digraph<object>((v) => new object[0]);
+            var digraph = new Digraph<object>(v => new object[0]);
             Assert.Equal(false, digraph.HasCycle(null));
         }
 
         [Fact]
         public void HasCycle_Null_edges_does_not_throw()
         {
-            var digraph = new Digraph<object>((v) => null);
+            var digraph = new Digraph<object>(v => null);
             Assert.Equal(false, digraph.HasCycle(new object()));
         }
 
@@ -36,7 +29,7 @@ namespace Graph.Tests
         public void HasCycle_Dictionary_Tests<T>
             (IDictionary<T, IEnumerable<T>> dataset, T node, bool expected)
         {
-            var digraph = new Digraph<T>((v) => dataset[v]);
+            var digraph = new Digraph<T>(v => dataset[v]);
             Assert.Equal(expected, digraph.HasCycle(node));
         }
 
@@ -44,74 +37,74 @@ namespace Graph.Tests
         {
             //1-node
             yield return new object[] {
-                new Dictionary<int, IEnumerable<int>> {{0, new Int32[] {}}}, 0, false };
+                new Dictionary<int, IEnumerable<int>> {{0, new int[] {}}}, 0, false };
 
             //1-node with cycle
             yield return new object[] {
-                new Dictionary<int, IEnumerable<int>> {{0, new Int32[] {0}}}, 0, true };
+                new Dictionary<int, IEnumerable<int>> {{0, new[] {0}}}, 0, true };
 
             //2-node dipole
-            var twonode = new Dictionary<int, IEnumerable<int>>
+            var twoNode = new Dictionary<int, IEnumerable<int>>
             {
-                [0] = new Int32[] { 1, 1, 1, 1, 1, 1, 1, 1 },
-                [1] = new Int32[] { 0, 0, 0, 0, 0, 0, 0, 0 }
+                [0] = new[] { 1, 1, 1, 1, 1, 1, 1, 1 },
+                [1] = new[] { 0, 0, 0, 0, 0, 0, 0, 0 }
             };
 
-            yield return new object[] { twonode, 0, true };
-            yield return new object[] { twonode, 1, true };
+            yield return new object[] { twoNode, 0, true };
+            yield return new object[] { twoNode, 1, true };
 
             //Multi-node
             var multiNode = new Dictionary<int, IEnumerable<int>>
             {
-                [0] = new Int32[] { 1, 2 },
-                [1] = new Int32[] { },
-                [2] = new Int32[] { }
+                [0] = new[] { 1, 2 },
+                [1] = new int[] { },
+                [2] = new int[] { }
             };
 
             yield return new object[] { multiNode, 0, false };
             yield return new object[] { multiNode, 1, false };
             yield return new object[] { multiNode, 2, false };
 
-            //Triangle cycle
-            var triangle = new Dictionary<int, IEnumerable<int>>
+            //3-node cycle
+            var threeNode = new Dictionary<int, IEnumerable<int>>
             {
-                [0] = new Int32[] { 1 },
-                [1] = new Int32[] { 2 },
-                [2] = new Int32[] { 0 }
+                [0] = new[] { 1 },
+                [1] = new[] { 2 },
+                [2] = new[] { 0 }
             };
 
-            yield return new object[] { triangle, 0, true };
-            yield return new object[] { triangle, 1, true };
-            yield return new object[] { triangle, 2, true };
+            yield return new object[] { threeNode, 0, true };
+            yield return new object[] { threeNode, 1, true };
+            yield return new object[] { threeNode, 2, true };
 
             //graph of nodes in cycle and not in cycle
-            var threegraph = new Dictionary<int, IEnumerable<int>>
+            var threeNode2 = new Dictionary<int, IEnumerable<int>>
             {
-                [0] = new Int32[] { 1, 2 },
-                [1] = new Int32[] { },
-                [2] = new Int32[] { 0 }
+                [0] = new[] { 1, 2 },
+                [1] = new int[] { },
+                [2] = new[] { 0 }
             };
 
-            yield return new object[] { threegraph, 0, true };
-            yield return new object[] { threegraph, 1, false };
-            yield return new object[] { threegraph, 2, true };
+            yield return new object[] { threeNode2, 0, true };
+            yield return new object[] { threeNode2, 1, false };
+            yield return new object[] { threeNode2, 2, true };
 
             //disconnected graph
-            var disconnectedgraph = new Dictionary<int, IEnumerable<int>>
+            var disconnectedGraph = new Dictionary<int, IEnumerable<int>>
             {
-                [0] = new Int32[] { },
-                [1] = new Int32[] { },
-                [2] = new Int32[] { }
+                [0] = new int[] { },
+                [1] = new int[] { },
+                [2] = new int[] { }
             };
 
-            yield return new object[] { disconnectedgraph, 0, false };
-            yield return new object[] { disconnectedgraph, 1, false };
-            yield return new object[] { disconnectedgraph, 2, false };
+            yield return new object[] { disconnectedGraph, 0, false };
+            yield return new object[] { disconnectedGraph, 1, false };
+            yield return new object[] { disconnectedGraph, 2, false };
 
             //string graph
             var stringsGraph = new Dictionary<string, IEnumerable<string>>
             {
-                ["Apple"] = new string[] { "Banana", "Canteloupe" },
+                ["Apple"] = new[] { "Banana", "Canteloupe" },
                 ["Banana"] = new string[] { },
                 ["Canteloupe"] = new string[] { }
             };
@@ -123,9 +116,9 @@ namespace Graph.Tests
             //string graph with cycle
             var stringsGraphWithCycle = new Dictionary<string, IEnumerable<string>>
             {
-                ["Apple"] = new string[] { "Banana" },
-                ["Banana"] = new string[] { "Canteloupe" },
-                ["Canteloupe"] = new string[] { "Apple" }
+                ["Apple"] = new[] { "Banana" },
+                ["Banana"] = new[] { "Canteloupe" },
+                ["Canteloupe"] = new[] { "Apple" }
             };
 
             yield return new object[] { stringsGraphWithCycle, "Apple", true };
@@ -136,9 +129,9 @@ namespace Graph.Tests
             var comparer = StringComparer.OrdinalIgnoreCase;
             var stringsGraphComparer = new Dictionary<string, IEnumerable<string>>(comparer)
             {
-                ["Apple"] = new string[] { "BANANA", "CANTELOUPE" },
-                ["Banana"] = new string[] { "APPLE" },
-                ["Canteloupe"] = new string[] { "DURIAN" },
+                ["Apple"] = new[] { "BANANA", "CANTELOUPE" },
+                ["Banana"] = new[] { "APPLE" },
+                ["Canteloupe"] = new[] { "DURIAN" },
                 ["Durian"] = new string[] { }
             };
 
@@ -154,18 +147,14 @@ namespace Graph.Tests
             yield return new object[] { 1 };
             yield return new object[] { 10 };
             yield return new object[] { 1000 };
-            yield return new object[] { MaxHashSetSize }; //limit prior to dotnetcore 2.0
-
-#if NETSTANDARD2_0
-            //yield return new object[] { Int32.MaxValue }; //new limit with 2.0? needs more testing
-#endif
+            yield return new object[] { MaxHashSetSize };
         }
 
         [Theory]
         [MemberData(nameof(GraphSizes))]
         public void OneDimensionalGraphTest(int size)
         {
-            var digraph = new Digraph<int>((v) => v < size - 1 ? new int[] { v + 1 } : new int[0]);
+            var digraph = new Digraph<int>(v => v < size - 1 ? new[] { v + 1 } : new int[0]);
             Assert.Equal(false, digraph.HasCycle(0, size));
         }
 
@@ -173,7 +162,7 @@ namespace Graph.Tests
         [MemberData(nameof(GraphSizes))]
         public void OneDimensionalCycleGraphTest(int size)
         {
-            var digraph = new Digraph<int>((v) => v < size - 1 ? new int[] { v + 1 } : new int[] { 0 });
+            var digraph = new Digraph<int>(v => v < size - 1 ? new[] { v + 1 } : new[] { 0 });
             Assert.Equal(true, digraph.HasCycle(0, size));
         }
 
@@ -181,18 +170,19 @@ namespace Graph.Tests
         [MemberData(nameof(HasCycle_ArrayOfArrays_TestData))]
         public void HasCycle_ArrayOfArrays_Tests(int[][] graph, int node, bool expected)
         {
-            var digraph = new Digraph<int>((v) => graph[v]);
+            var digraph = new Digraph<int>(v => graph[v]);
             Assert.Equal(expected, digraph.HasCycle(node));
         }
 
         public static IEnumerable<object[]> HasCycle_ArrayOfArrays_TestData()
         {
             //nodes mapped by index in array
-            var graphMap = new int[][]{
-                new int[] {1,3},
-                new int[] {2},
+            var graphMap = new[]
+            {
+                new[] {1,3},
+                new[] {2},
                 new int[] {},
-                new int[] {0},
+                new[] {0},
             };
 
             yield return new object[] { graphMap, 0, true };
@@ -209,7 +199,7 @@ namespace Graph.Tests
         {
             var lookup = E.ToLookup(e => e.v1, e => e.v2);
 
-            var digraph = new Digraph<T>((v) => lookup[v]);
+            var digraph = new Digraph<T>(v => lookup[v]);
             Assert.Equal(expected, digraph.HasCycle(node));
         }
 
@@ -235,17 +225,17 @@ namespace Graph.Tests
             //String graph ignore case
             var ignoreCaseComparer = StringComparer.OrdinalIgnoreCase;
 
-            var animalSet = new Dictionary<String, IEnumerable<String>>(ignoreCaseComparer)
+            var animalSet = new Dictionary<string, IEnumerable<string>>(ignoreCaseComparer)
             {
                 ["Angelfish"] = new[] { "cat", "dog" },
                 ["Bear"] = new[] { "Angelfish", "Rabbit" },
-                ["Camel"] = new String[] { },
-                ["CAT"] = new String[] { "dog" },
-                ["Dog"] = new String[] { "cat" },
-                ["Rabbit"] = new String[] { "CAMEL" }
+                ["Camel"] = new string[] { },
+                ["CAT"] = new[] { "dog" },
+                ["Dog"] = new[] { "cat" },
+                ["Rabbit"] = new[] { "CAMEL" }
             };
 
-            var ignoreCaseGraph = new Digraph<string>((v) => animalSet[v], ignoreCaseComparer);
+            var ignoreCaseGraph = new Digraph<string>(v => animalSet[v], ignoreCaseComparer);
             Assert.True(ignoreCaseGraph.HasCycle("Angelfish"));
             Assert.True(ignoreCaseGraph.HasCycle("Bear"));
             Assert.False(ignoreCaseGraph.HasCycle("Camel"));
@@ -262,14 +252,15 @@ namespace Graph.Tests
                 return x + moduloIndex * random.Next(1, 1000);
             }
 
-            var graphMap = new int[][]{
-                new int[] {1,3},
-                new int[] {2},
+            var graphMap = new[]
+            {
+                new[] {1,3},
+                new[] {2},
                 new int[] {},
-                new int[] {0},
+                new[] {0},
             };
 
-            var arrayGraph = new Digraph<int>((v) => graphMap[v % moduloIndex].Select(getRandomCongruent));
+            var arrayGraph = new Digraph<int>(v => graphMap[v % moduloIndex].Select(getRandomCongruent));
 
             Assert.True(arrayGraph.HasCycle(0));
             Assert.False(arrayGraph.HasCycle(1));
@@ -293,7 +284,7 @@ namespace Graph.Tests
                 return (GetHashCode(x) - GetHashCode(y)) % _modulo == 0;
             }
 
-            public Int32 GetHashCode(T value)
+            public int GetHashCode(T value)
             {
                 return value.GetHashCode();
             }

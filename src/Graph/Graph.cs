@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Graph
@@ -50,14 +49,8 @@ namespace Graph
         /// <param name="comparer">Comparer</param>
         public Digraph(Func<T, IEnumerable<T>> forwardAdjacencies, IEqualityComparer<T> comparer)
         {
-            if (forwardAdjacencies == null)
-                throw new NullReferenceException(nameof(forwardAdjacencies));
-            if (comparer == null)
-                throw new NullReferenceException(nameof(comparer));
-            Contract.EndContractBlock();
-
-            _forwardAdjacencies = forwardAdjacencies;
-            _comparer = comparer;
+            _forwardAdjacencies = forwardAdjacencies ?? throw new NullReferenceException(nameof(forwardAdjacencies));
+            _comparer = comparer ?? throw new NullReferenceException(nameof(comparer));
         }
 
         /// <summary>
@@ -65,7 +58,7 @@ namespace Graph
         /// </summary>if (object.ReferenceEquals(origin, null))
         /// <param name="origin">Origin vertex.</param>
         /// <returns><c>true</c>, if cycle was detected, <c>false</c> otherwise.</returns>
-        public virtual Boolean HasCycle(T origin)
+        public virtual bool HasCycle(T origin)
         {
             return HasCycle(origin, 0);
         }
@@ -75,11 +68,13 @@ namespace Graph
         /// </summary>
         /// <returns><c>true</c>, if cycle was detected, <c>false</c> otherwise.</returns>
         /// <param name="origin">Origin vertex.</param>
-        /// <param name="capacity">Initial capacity of working data containers, NetStandard 2.0 required</param>
-        public virtual Boolean HasCycle(T origin, Int32 capacity)
+        /// <param name="capacity">Initial capacity of working data containers</param>
+        public virtual bool HasCycle(T origin, int capacity)
         {
             var skipList = new HashSet<T>(_comparer);
             var knownBackEdges = new HashSet<T>(_comparer);
+            skipList.SetCapacity(capacity);
+            knownBackEdges.SetCapacity(capacity);
 
             return HasCycle(origin, knownBackEdges, skipList);
         }
@@ -91,7 +86,7 @@ namespace Graph
         /// <param name="origin">Origin.</param>
         /// <param name="knownBackEdges">List of known back edges.</param>
         /// <param name="skipList">Edges to skip.</param>
-        protected Boolean HasCycle(T origin, ICollection<T> knownBackEdges, ICollection<T> skipList)
+        protected bool HasCycle(T origin, ICollection<T> knownBackEdges, ICollection<T> skipList)
         {
 
             var stack = new Stack<T>(new[] { origin });
@@ -108,7 +103,7 @@ namespace Graph
                 knownBackEdges.Add(vertex);
 
                 var fa = _forwardAdjacencies(vertex)?.Where(adj => !skipList.Contains(adj));
-                if (fa == null || !fa.Any())
+                if (fa is null || !fa.Any())
                 {
                     //base case
                     knownBackEdges.Remove(vertex);
