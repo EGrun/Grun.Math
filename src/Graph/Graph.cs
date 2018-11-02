@@ -73,8 +73,8 @@ namespace Graph
         {
             var skipList = new HashSet<T>(_comparer);
             var knownBackEdges = new HashSet<T>(_comparer);
-            skipList.SetCapacity(capacity);
-            knownBackEdges.SetCapacity(capacity);
+            //skipList.SetCapacity(capacity);
+            //knownBackEdges.SetCapacity(capacity);
 
             return HasCycle(origin, knownBackEdges, skipList);
         }
