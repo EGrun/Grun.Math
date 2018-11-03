@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Xunit;
 using System.Linq;
 using Graph.Collections;
+using Xunit;
 
 namespace Graph.Tests
 {
-
     public class GraphTests
     {
         public const int MaxHashSetSize = 110921543;
@@ -177,7 +176,7 @@ namespace Graph.Tests
             yield return new object[] { 1 };
             yield return new object[] { 10 };
             yield return new object[] { 1000 };
-            //yield return new object[] { MaxHashSetSize };
+            yield return new object[] { MaxHashSetSize };
             //yield return new object[] { int.MaxValue };
             //yield return new object[] { double.MaxValue };
         }
@@ -226,7 +225,6 @@ namespace Graph.Tests
             yield return new object[] { graphMap, 3, true };
         }
 
-
         [Theory]
         [MemberData(nameof(HasCycle_ValueTupleEdgeSet_TestData))]
         public void HasCycle_ValueTupleEdgeSet_GetExpectedValues<T>
@@ -257,7 +255,6 @@ namespace Graph.Tests
         [Fact]
         public void HasCycle_GenericComparer_GetExpectedValues()
         {
-
             // String graph ignore case
             var ignoreCaseComparer = StringComparer.OrdinalIgnoreCase;
 
@@ -309,7 +306,7 @@ namespace Graph.Tests
 
         class CongruencyComparer<T> : IEqualityComparer<T>
         {
-            int _modulo;
+            readonly int _modulo;
 
             public CongruencyComparer(int modulo)
             {

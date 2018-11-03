@@ -1,6 +1,6 @@
-﻿using Graph.Collections;
-using System;
+﻿using System;
 using System.Linq;
+using Graph.Collections;
 
 namespace Graph
 {
@@ -8,14 +8,14 @@ namespace Graph
     {
         private readonly Func<ISet<T>> _setFactory;
         private readonly Func<IStack<T>> _stackFactory;
-        private readonly Digraph<T> _digraph;
+        private readonly IDigraph<T> _digraph;
 
-        public DigraphAnalyzer (Digraph<T> digraph)
+        public DigraphAnalyzer (IDigraph<T> digraph)
             : this (digraph, () => new InMemorySet<T>(), () => new InMemoryStack<T>())
         {
         }
 
-        public DigraphAnalyzer(Digraph<T> digraph, Func<ISet<T>> setFactory, Func<IStack<T>> stackFactory)
+        public DigraphAnalyzer(IDigraph<T> digraph, Func<ISet<T>> setFactory, Func<IStack<T>> stackFactory)
         {
             _digraph = digraph ?? throw new ArgumentNullException(nameof(digraph));
             _setFactory = setFactory ?? throw new ArgumentNullException(nameof(setFactory));
@@ -57,13 +57,13 @@ namespace Graph
                 var fa = _digraph.ForwardAdjacencies(vertex)?.Where(adj => !knownAcyclicVertices.Contains(adj));
                 if (fa is null || !fa.Any())
                 {
-                    //base case
+                    // base case
                     knownBackEdges.Remove(vertex);
                     knownAcyclicVertices.Add(vertex);
                 }
                 else
                 {
-                    //recursive case
+                    // recursive case
                     workingStack.Push(vertex);
                     foreach (var adj in fa)
                     {
