@@ -45,7 +45,7 @@ namespace Graph
         /// <param name="knownVertices">List of known vertices that have previously been calculated to have no cycle</param>
         private bool HasCycle(ISet<T> knownBackEdges, ISet<T> knownAcyclicVertices, IStack<T> workingStack)
         {
-            while (workingStack.Count > 0)
+            while (!workingStack.IsEmpty)
             {
                 var vertex = workingStack.Pop();
                 if (knownAcyclicVertices.Contains(vertex))

@@ -3,10 +3,10 @@
     public interface IStack<T>
     {
         /// <summary>
-        /// Returns count of items in the <see cref="IStack{T}"/>.
+        /// Gets a value that indicates whether the <see cref="IStack{T}"/> is empty.
         /// </summary>
         /// <returns></returns>
-        int Count { get; }
+        bool IsEmpty { get; }
 
         /// <summary>
         /// Inserts an object at the top of the <see cref="IStack{T}"/>.

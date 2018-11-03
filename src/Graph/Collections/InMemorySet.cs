@@ -3,7 +3,7 @@
 namespace Graph.Collections
 {
     /// <inheritdoc cref="ISet{T}"/>
-    public class InMemorySet<T> : ISet<T>
+    public sealed class InMemorySet<T> : ISet<T>
     {
         private HashSet<T> _internalSet;
 

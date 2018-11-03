@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Graph.Collections
 {
     /// <inheritdoc cref="IStack{T}"/>
-    public class InMemoryStack<T> : IStack<T>
+    public sealed class InMemoryStack<T> : IStack<T>
     {
         private Stack<T> _internalStack;
 
@@ -13,9 +13,12 @@ namespace Graph.Collections
             _internalStack = new Stack<T>();
         }
 
-        public int Count
+        public bool IsEmpty
         {
-            get { return _internalStack.Count; }
+            get
+            {
+                return _internalStack.Count == 0;
+            }
         }
 
         public T Peek()

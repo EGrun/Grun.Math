@@ -3,7 +3,7 @@
 namespace Graph.Collections
 {
     /// <inheritdoc cref="IStack{T}"/>
-    public class BigInMemoryStack<T> : IStack<T>
+    public sealed class BigInMemoryStack<T> : IStack<T>
     {
         private ConcurrentStack<T> _internalStack;
 
@@ -12,9 +12,12 @@ namespace Graph.Collections
             _internalStack = new ConcurrentStack<T>();
         }
 
-        public int Count
+        public bool IsEmpty
         {
-            get { return _internalStack.Count; }
+            get
+            {
+                return _internalStack.IsEmpty;
+            }
         }
 
         public T Peek()

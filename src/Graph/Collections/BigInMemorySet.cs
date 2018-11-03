@@ -5,10 +5,10 @@ using System.Linq;
 namespace Graph.Collections
 {
     /// <inheritdoc cref="ISet{T}"/>
-    public class BigInMemorySet<T> : ISet<T>
+    public sealed class BigInMemorySet<T> : ISet<T>
     {
         private List<HashSet<T>> _setCollection;
-        private int _index = 0;
+        private HashSet<T> _curHashSet;
         private Func<HashSet<T>> _hashSetFactory;
 
         public BigInMemorySet()
@@ -25,36 +25,38 @@ namespace Graph.Collections
 
         private void Initialize()
         {
+            _curHashSet = _hashSetFactory.Invoke();
             _setCollection = new List<HashSet<T>>
             {
-                _hashSetFactory.Invoke()
+                _curHashSet
             };
-            _index = 0;
         }
         
         public void Add(T item)
         {
             try
             {
-                _setCollection[_index].Add(item);
+                _curHashSet.Add(item);
             }
             catch (OutOfMemoryException)
             {
-                var hashSet = _hashSetFactory.Invoke();
-                hashSet.Add(item);
-                _setCollection.Add(hashSet);
-                _index++;
+                _curHashSet = _hashSetFactory.Invoke();
+                _curHashSet.Add(item);
+                _setCollection.Add(_curHashSet);
             }
         }
 
         public void Remove(T item)
         {
-            _setCollection.AsParallel().ForAll(hashSet => hashSet.Remove(item));
+            foreach (var hashSet in _setCollection)
+            {
+                hashSet.Remove(item);
+            }
         }
 
         public bool Contains(T item)
         {
-            return _setCollection.AsParallel().Any(hashSet => hashSet.Contains(item));
+            return _setCollection.Any(hashSet => hashSet.Contains(item));
         }
     }
 }

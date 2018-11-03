@@ -177,9 +177,9 @@ namespace Graph.Tests
             yield return new object[] { 1 };
             yield return new object[] { 10 };
             yield return new object[] { 1000 };
-            // ignore long tests
-            // yield return new object[] { MaxHashSetSize };
-            // yield return new object[] { int.MaxValue };
+            //yield return new object[] { MaxHashSetSize };
+            //yield return new object[] { int.MaxValue };
+            //yield return new object[] { double.MaxValue };
         }
 
         [Theory]
@@ -187,7 +187,7 @@ namespace Graph.Tests
         public void HasCycle_BigInMemoryCollectionsNonCycle_GetExpectedValues(double size)
         {
             var digraph = new Digraph<int>(() => null, v => v < size - 1 ? new[] { v + 1 } : new int[0]);
-            var analyzer = new DigraphAnalyzer<int>(digraph, () => new BigInMemorySet<int>(), () => new BigInMemoryStack<int>());
+            var analyzer = new DigraphAnalyzer<int>(digraph, () => new BigInMemorySet<int>(), () => new InMemoryStack<int>());
             Assert.Equal(false, analyzer.HasCycle(0));
         }
 
@@ -196,7 +196,7 @@ namespace Graph.Tests
         public void HasCycle_BigInMemoryCollectionsCycle_GetExpectedValues(double size)
         {
             var digraph = new Digraph<int>(() => null, v => v < size - 1 ? new[] { v + 1 } : new[] { 0 });
-            var analyzer = new DigraphAnalyzer<int>(digraph, () => new BigInMemorySet<int>(), () => new BigInMemoryStack<int>());
+            var analyzer = new DigraphAnalyzer<int>(digraph, () => new BigInMemorySet<int>(), () => new InMemoryStack<int>());
             Assert.Equal(true, analyzer.HasCycle(0));
         }
 
