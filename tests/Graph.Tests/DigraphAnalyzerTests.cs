@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Graph.Tests
 {
-    public class GraphTests
+    public class DigraphAnalyzerTests
     {
         public const int MaxHashSetSize = 110921543;
 
@@ -15,7 +15,7 @@ namespace Graph.Tests
         {
             var digraph = new Digraph<object>(() => null, v => new object[0]);
             var analyzer = new DigraphAnalyzer<object>(digraph);
-            Assert.Equal(false, analyzer.HasCycle(null));
+            Assert.False(analyzer.HasCycle(null));
         }
 
         [Fact]
@@ -23,7 +23,7 @@ namespace Graph.Tests
         {
             var digraph = new Digraph<object>(() => null, v => null);
             var analyzer = new DigraphAnalyzer<object>(digraph);
-            Assert.Equal(false, analyzer.HasCycle(new object()));
+            Assert.False(analyzer.HasCycle(new object()));
         }
 
         [Theory]
@@ -159,7 +159,7 @@ namespace Graph.Tests
         {
             var digraph = new Digraph<int>(() => null, v => v < size - 1 ? new[] { v + 1 } : new int[0]);
             var analyzer = new DigraphAnalyzer<int>(digraph);
-            Assert.Equal(false, analyzer.HasCycle(0));
+            Assert.False(analyzer.HasCycle(0));
         }
 
         [Theory]
@@ -168,7 +168,7 @@ namespace Graph.Tests
         {
             var digraph = new Digraph<int>(() => null, v => v < size - 1 ? new[] { v + 1 } : new[] { 0 });
             var analyzer = new DigraphAnalyzer<int>(digraph);
-            Assert.Equal(true, analyzer.HasCycle(0));
+            Assert.True(analyzer.HasCycle(0));
         }
 
         public static IEnumerable<object[]> BigGraphSizes()
@@ -187,7 +187,7 @@ namespace Graph.Tests
         {
             var digraph = new Digraph<int>(() => null, v => v < size - 1 ? new[] { v + 1 } : new int[0]);
             var analyzer = new DigraphAnalyzer<int>(digraph, () => new BigInMemorySet<int>(), () => new InMemoryStack<int>());
-            Assert.Equal(false, analyzer.HasCycle(0));
+            Assert.False(analyzer.HasCycle(0));
         }
 
         [Theory]
@@ -196,7 +196,7 @@ namespace Graph.Tests
         {
             var digraph = new Digraph<int>(() => null, v => v < size - 1 ? new[] { v + 1 } : new[] { 0 });
             var analyzer = new DigraphAnalyzer<int>(digraph, () => new BigInMemorySet<int>(), () => new InMemoryStack<int>());
-            Assert.Equal(true, analyzer.HasCycle(0));
+            Assert.True(analyzer.HasCycle(0));
         }
 
         [Theory]
@@ -230,9 +230,7 @@ namespace Graph.Tests
         public void HasCycle_ValueTupleEdgeSet_GetExpectedValues<T>
             (T node, T[] V, (T v1, T v2)[] E, bool expected)
         {
-            var lookup = E.ToLookup(e => e.v1, e => e.v2);
-
-            var digraph = new Digraph<T>(() => null, v => lookup[v]);
+            var digraph = new Digraph<T>(V, E);
             var analyzer = new DigraphAnalyzer<T>(digraph);
             Assert.Equal(expected, analyzer.HasCycle(node));
         }

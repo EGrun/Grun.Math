@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Graph
 {
@@ -18,6 +19,13 @@ namespace Graph
         {
             _vertices = vertices ?? throw new NullReferenceException(nameof(vertices));
             _forwardAdjacencies = forwardAdjacencies ?? throw new NullReferenceException(nameof(forwardAdjacencies));
+        }
+
+        public Digraph(T[] vertices, (T v1, T v2)[] edges)
+        {
+            _vertices = () => vertices;
+            var lookup = edges.ToLookup(e => e.v1, e => e.v2);
+            _forwardAdjacencies = v => lookup[v];
         }
         
         /// <inheritdoc />
