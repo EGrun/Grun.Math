@@ -13,13 +13,13 @@ efficient manner than if the entire graph were loaded into memory.
 Define graph G:=(V,E) where:
     
 set V of vertices in G
-```int[] V = { 0, 1, 2 };```
+```Node[] V = { node0, node1, node2 };```
     
 set E of edges in G
-```var E = new(int v1, int v2)[] {(0,1), (0, 2)};```
+```var E = new(Node v1, Node v2)[] {(node0, node1), (node0, node2)};```
     
 adjacency computation - define graph as function
 ```var lookup = E.ToLookup(e => e.v1, e => e.v2);
-Func<int, IEnumerable<int>> graph = (v) => lookup[v];
+Func<Node, IEnumerable<Node>> graph = (v) => lookup[v];
     
 Assert.Equal(false, graph.HasCycle(0));```
