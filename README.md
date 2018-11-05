@@ -22,4 +22,4 @@ adjacency computation - define graph as function
 ```var lookup = E.ToLookup(e => e.v1, e => e.v2);
 Func<Node, IEnumerable<Node>> graph = (v) => lookup[v];
     
-Assert.Equal(false, graph.HasCycle(0));```
+Assert.Equal(false, graph.HasCycle(node0));```
