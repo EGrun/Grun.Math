@@ -4,18 +4,18 @@ using Graph.Collections;
 
 namespace Graph
 {
-    public sealed class DigraphAnalyzer<T>
+    public sealed class CycleAnalyzer<T>
     {
         private readonly Func<ISet<T>> _setFactory;
         private readonly Func<IStack<T>> _stackFactory;
         private readonly IDigraph<T> _digraph;
 
-        public DigraphAnalyzer (IDigraph<T> digraph)
+        public CycleAnalyzer (IDigraph<T> digraph)
             : this (digraph, () => new InMemorySet<T>(), () => new InMemoryStack<T>())
         {
         }
 
-        public DigraphAnalyzer(IDigraph<T> digraph, Func<ISet<T>> setFactory, Func<IStack<T>> stackFactory)
+        public CycleAnalyzer(IDigraph<T> digraph, Func<ISet<T>> setFactory, Func<IStack<T>> stackFactory)
         {
             _digraph = digraph ?? throw new ArgumentNullException(nameof(digraph));
             _setFactory = setFactory ?? throw new ArgumentNullException(nameof(setFactory));

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Graph.Tests
 {
-    public class DigraphAnalyzerTests
+    public class CycleAnalyzerTests
     {
         public const int MaxHashSetSize = 110921543;
 
@@ -14,7 +14,7 @@ namespace Graph.Tests
         public void HasCycle_NullInput_DoesNotThrowReturnsFalse()
         {
             var digraph = new Digraph<object>(() => null, v => new object[0]);
-            var analyzer = new DigraphAnalyzer<object>(digraph);
+            var analyzer = new CycleAnalyzer<object>(digraph);
             Assert.False(analyzer.HasCycle(null));
         }
 
@@ -22,7 +22,7 @@ namespace Graph.Tests
         public void HasCycle_NullEdges_DoesNotThrowReturnsFalse()
         {
             var digraph = new Digraph<object>(() => null, v => null);
-            var analyzer = new DigraphAnalyzer<object>(digraph);
+            var analyzer = new CycleAnalyzer<object>(digraph);
             Assert.False(analyzer.HasCycle(new object()));
         }
 
@@ -32,7 +32,7 @@ namespace Graph.Tests
             (IDictionary<T, IEnumerable<T>> dataset, T node, bool expected)
         {
             var digraph = new Digraph<T>(() => null, v => dataset[v]);
-            var analyzer = new DigraphAnalyzer<T>(digraph);
+            var analyzer = new CycleAnalyzer<T>(digraph);
             Assert.Equal(expected, analyzer.HasCycle(node));
         }
 
@@ -158,7 +158,7 @@ namespace Graph.Tests
         public void HasCycle_OneDimensionalNonCycle_GetExpectedValues(int size)
         {
             var digraph = new Digraph<int>(() => null, v => v < size - 1 ? new[] { v + 1 } : new int[0]);
-            var analyzer = new DigraphAnalyzer<int>(digraph);
+            var analyzer = new CycleAnalyzer<int>(digraph);
             Assert.False(analyzer.HasCycle(0));
         }
 
@@ -167,7 +167,7 @@ namespace Graph.Tests
         public void HasCycle_OneDimensionalCycle_GetExpectedValues(int size)
         {
             var digraph = new Digraph<int>(() => null, v => v < size - 1 ? new[] { v + 1 } : new[] { 0 });
-            var analyzer = new DigraphAnalyzer<int>(digraph);
+            var analyzer = new CycleAnalyzer<int>(digraph);
             Assert.True(analyzer.HasCycle(0));
         }
 
@@ -186,7 +186,7 @@ namespace Graph.Tests
         public void HasCycle_BigInMemoryCollectionsNonCycle_GetExpectedValues(double size)
         {
             var digraph = new Digraph<int>(() => null, v => v < size - 1 ? new[] { v + 1 } : new int[0]);
-            var analyzer = new DigraphAnalyzer<int>(digraph, () => new BigInMemorySet<int>(), () => new InMemoryStack<int>());
+            var analyzer = new CycleAnalyzer<int>(digraph, () => new BigInMemorySet<int>(), () => new InMemoryStack<int>());
             Assert.False(analyzer.HasCycle(0));
         }
 
@@ -195,7 +195,7 @@ namespace Graph.Tests
         public void HasCycle_BigInMemoryCollectionsCycle_GetExpectedValues(double size)
         {
             var digraph = new Digraph<int>(() => null, v => v < size - 1 ? new[] { v + 1 } : new[] { 0 });
-            var analyzer = new DigraphAnalyzer<int>(digraph, () => new BigInMemorySet<int>(), () => new InMemoryStack<int>());
+            var analyzer = new CycleAnalyzer<int>(digraph, () => new BigInMemorySet<int>(), () => new InMemoryStack<int>());
             Assert.True(analyzer.HasCycle(0));
         }
 
@@ -204,7 +204,7 @@ namespace Graph.Tests
         public void HasCycle_ArrayOfArrays_GetExpectedValues(int[][] graph, int node, bool expected)
         {
             var digraph = new Digraph<int>(() => null, v => graph[v]);
-            var analyzer = new DigraphAnalyzer<int>(digraph);
+            var analyzer = new CycleAnalyzer<int>(digraph);
             Assert.Equal(expected, analyzer.HasCycle(node));
         }
 
@@ -231,7 +231,7 @@ namespace Graph.Tests
             (T node, T[] V, (T v1, T v2)[] E, bool expected)
         {
             var digraph = new Digraph<T>(V, E);
-            var analyzer = new DigraphAnalyzer<T>(digraph);
+            var analyzer = new CycleAnalyzer<T>(digraph);
             Assert.Equal(expected, analyzer.HasCycle(node));
         }
 
@@ -267,7 +267,7 @@ namespace Graph.Tests
             };
 
             var ignoreCaseGraph = new Digraph<string>(() => null, v => animalSet[v]);
-            var ignoreCaseAnalyzer = new DigraphAnalyzer<string>(ignoreCaseGraph, () => new InMemorySet<string>(ignoreCaseComparer), () => new InMemoryStack<string>());
+            var ignoreCaseAnalyzer = new CycleAnalyzer<string>(ignoreCaseGraph, () => new InMemorySet<string>(ignoreCaseComparer), () => new InMemoryStack<string>());
             Assert.True(ignoreCaseAnalyzer.HasCycle("Angelfish"));
             Assert.True(ignoreCaseAnalyzer.HasCycle("Bear"));
             Assert.False(ignoreCaseAnalyzer.HasCycle("Camel"));
@@ -293,7 +293,7 @@ namespace Graph.Tests
             };
 
             var arrayGraph = new Digraph<int>(() => null, v => graphMap[v % moduloIndex].Select(getRandomCongruent));
-            var analyzer = new DigraphAnalyzer<int>(arrayGraph, () => new InMemorySet<int>(congruencyComparer), () => new InMemoryStack<int>());
+            var analyzer = new CycleAnalyzer<int>(arrayGraph, () => new InMemorySet<int>(congruencyComparer), () => new InMemoryStack<int>());
 
             Assert.True(analyzer.HasCycle(0));
             Assert.False(analyzer.HasCycle(1));
