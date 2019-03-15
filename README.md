@@ -10,6 +10,7 @@ is computationally or memory intensive or in distributed computing scenarios.
 Since edges are not precomputed, an algorithm may be shortcircuited in a more
 efficient manner than if the entire graph were loaded into memory.
 
+
 Define graph G:=(V,E) where:
     
 set V of vertices in G
