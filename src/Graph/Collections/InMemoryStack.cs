@@ -35,33 +35,5 @@ namespace Graph.Collections
         {
             _internalStack.Push(item);
         }
-
-        public bool TryPeek(out T result)
-        {
-            try
-            {
-                result = _internalStack.Peek();
-                return true;
-            }
-            catch (InvalidOperationException)
-            {
-                result = default;
-                return false;
-            }
-        }
-
-        public bool TryPop(out T result)
-        {
-            try
-            {
-                result = _internalStack.Pop();
-                return true;
-            }
-            catch (InvalidOperationException)
-            {
-                result = default;
-                return false;
-            }
-        }
     }
 }

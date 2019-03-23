@@ -3,10 +3,10 @@
 namespace Graph.Collections
 {
     /// <inheritdoc cref="IStack{T}"/>
-    public sealed class BigInMemoryStack<T> : IStack<T>
+    public sealed class LinkedStack<T> : IStack<T>
     {
         /// <summary>
-        /// A simple (internal) node type used to store elements of <see cref="BigInMemoryStack{T}"/>.
+        /// A simple (internal) node type used to store elements of <see cref="LinkedStack{T}"/>.
         /// </summary>
         private sealed class Node
         {
@@ -61,29 +61,6 @@ namespace Graph.Collections
                 _next = _head,
             };
             _head = newNode;
-        }
-
-        public bool TryPeek(out T result)
-        {
-            if (_head is null)
-            {
-                result = default;
-                return false;
-            }
-            result = _head._value;
-            return true;
-        }
-
-        public bool TryPop(out T result)
-        {
-            if (_head is null)
-            {
-                result = default;
-                return false;
-            }
-            result = _head._value;
-            _head = _head._next;
-            return true;
         }
     }
 }

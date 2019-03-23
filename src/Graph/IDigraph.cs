@@ -6,19 +6,19 @@ namespace Graph
     /// Directed Graph consisting of a set of vertices and a method for
     /// resolving the set of forward directed adjacent edges.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface IDigraph<T>
+    /// <typeparam name="TVertex"></typeparam>
+    public interface IDigraph<TVertex>
     {
         /// <summary>
         /// Collection of nodes that comprise the graph
         /// </summary>
-        IEnumerable<T> Vertices { get; }
+        IEnumerable<TVertex> Vertices { get; }
 
         /// <summary>
-        /// The set of all vertices adjecent to this one on the directed graph
+        /// The set of all edges connected to supplied node on the directed graph.
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-         IEnumerable<T> ForwardAdjacencies(T node);
+        IEnumerable<IEdge<TVertex>> ConnectedEdges(TVertex node);
     }
 }

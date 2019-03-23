@@ -27,19 +27,5 @@
         /// <returns>The object removed from the top of the <see cref="IStack{T}"/>.</returns>
         /// <exception cref="InvalidOperationException">The <see cref="IStack{T}"/> is empty.</exception> 
         T Pop();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        bool TryPeek(out T result);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        bool TryPop(out T result);
     }
 }

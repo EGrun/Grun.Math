@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 
 namespace Graph
 {
-    public class Edge<TVertex>
+    public class Edge<TVertex> : IEdge<TVertex>
     {
         public Edge (TVertex source, TVertex target)
         {

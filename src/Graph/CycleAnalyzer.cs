@@ -54,7 +54,7 @@ namespace Graph
                 }
                 knownBackEdges.Add(vertex);
 
-                var fa = _digraph.ForwardAdjacencies(vertex)?.Where(adj => !knownAcyclicVertices.Contains(adj));
+                var fa = _digraph.ConnectedEdges(vertex)?.Where(adj => !knownAcyclicVertices.Contains(adj.Target));
                 if (fa is null || !fa.Any())
                 {
                     // base case
@@ -67,11 +67,11 @@ namespace Graph
                     workingStack.Push(vertex);
                     foreach (var adj in fa)
                     {
-                        if (knownBackEdges.Contains(adj))
+                        if (knownBackEdges.Contains(adj.Target))
                         {
                             return true;
                         }
-                        workingStack.Push(adj);
+                        workingStack.Push(adj.Target);
                     }
                 }
             }
